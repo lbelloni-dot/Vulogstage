@@ -1,6 +1,5 @@
 name: Gemini PR Code Review
 
-# Se déclenche à chaque fois qu'une PR est ouverte ou mise à jour
 on:
   pull_request:
     types: [opened, synchronize]
@@ -18,11 +17,11 @@ jobs:
           python-version: '3.10'
 
       - name: Installer les dépendances
-        run: pip install --upgrade google-generativeai requests
+        run: pip install google-generativeai requests
 
       - name: Lancer le script de revue par IA
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # Clé à configurer dans les "Secrets" GitHub
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: python scripts/pr_reviewer.py
