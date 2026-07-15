@@ -10,7 +10,7 @@ REPO = os.environ.get("GITHUB_REPOSITORY")
 
 # 2. Configuration de Gemini
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-1.0-pro')
+model = genai.GenerativeModel('gemini-pro')
 
 def main():
     # 3. Récupérer le "Diff" (les modifications de code) via l'API GitHub
