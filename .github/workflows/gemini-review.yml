@@ -18,6 +18,7 @@ jobs:
 
       - name: Installer les dépendances
         run: pip install google-genai requests
+
         
       - name: Lancer le script de revue par IA
         env:
