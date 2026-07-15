@@ -1,8 +1,8 @@
 import os
 import requests
-import google.generativeai as genai
+from google import genai
 
-# 1. Récupération des variables d'environnement
+# 1. Récupération des variables
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 PR_NUMBER = os.environ.get("PR_NUMBER")
@@ -13,11 +13,7 @@ def main():
         print("Erreur : GEMINI_API_KEY est introuvable.")
         exit(1)
 
-    # 2. Configuration de Gemini
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-1.5-flash")
-
-    # 3. Récupérer le 'Diff' de la Pull Request via l'API GitHub
+    # 2. Récupérer le code de la Pull Request
     headers = {
         "Authorization": f"Bearer {GITHUB_TOKEN}",
         "Accept": "application/vnd.github.v3.diff"
@@ -26,18 +22,23 @@ def main():
     diff_response = requests.get(url, headers=headers)
     code_diff = diff_response.text
 
-    # 4. Demander l'analyse à Gemini
+    # 3. Préparer la question
     prompt = (
         "Tu es un développeur Senior bienveillant. Fais une revue de code sur ce 'diff' de Pull Request. "
         "Si le code est bon, dis-le. S'il y a des failles de sécurité, des problèmes de performance "
         "ou des erreurs de style, signale-les avec bienveillance.\n\n"
         f"Voici le code à analyser :\n\n{code_diff}"
     )
-    
-    print("Envoi du code à l'API Gemini...")
-    response = model.generate_content(prompt)
 
-    # 5. Poster le commentaire sur la Pull Request
+    # 4. Appeler Gemini avec la NOUVELLE bibliothèque
+    print("Envoi du code à l'API Gemini...")
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    response = client.models.generate_content(
+        model='gemini-1.5-flash',
+        contents=prompt
+    )
+
+    # 5. Poster la réponse sur GitHub
     comment_headers = {
         "Authorization": f"Bearer {GITHUB_TOKEN}",
         "Accept": "application/vnd.github.v3+json"
