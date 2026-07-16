@@ -17,16 +17,20 @@ def main():
         "Accept": "application/vnd.github.v3.diff"
     }
     url_gh = f"https://api.github.com/repos/{REPO}/pulls/{PR_NUMBER}"
-    diff_response = requests.get(url_gh, headers=headers_gh)
-    code_diff = diff_response.text
+    
+    try:
+        diff_response = requests.get(url_gh, headers=headers_gh)
+        code_diff = diff_response.text
+    except Exception as e:
+        print(f"Erreur lors de la récupération de la PR : {e}")
+        exit(1)
 
     prompt = (
         "Tu es un développeur Senior bienveillant. Fais une revue de code concise sur ce 'diff'. "
         f"Voici le code à analyser :\n\n{code_diff}"
     )
 
-    # 4. APPEL AVEC LE MODÈLE SECU EN 2.0
-    print("--- DEBUT DE L'ANALYSE AVEC GEMINI 2.0 FLASH ---")
+    print("--- DEBUT DE L'ANALYSE AVEC GEMINI 3.1 FLASH LITE ---")
     client = genai.Client(api_key=GEMINI_API_KEY)
     
     try:
@@ -45,8 +49,16 @@ def main():
         "Accept": "application/vnd.github.v3+json"
     }
     url_comment = f"https://api.github.com/repos/{REPO}/issues/{PR_NUMBER}/comments"
-    requests.post(url_comment, headers=comment_headers, json={"body": ai_review})
-    print("✅ Revue de code postée avec succès !")
+    
+    # Amélioration recommandée par le bot : gestion d'erreur sur le post du commentaire
+    try:
+        comment_response = requests.post(url_comment, headers=comment_headers, json={"body": ai_review})
+        if comment_response.status_code == 201:
+            print("✅ Revue de code postée avec succès !")
+        else:
+            print(f"❌ Erreur GitHub API ({comment_response.status_code}) : {comment_response.text}")
+    except Exception as e:
+        print(f"Erreur réseau lors de la publication du commentaire : {e}")
 
 if __name__ == "__main__":
     main()
