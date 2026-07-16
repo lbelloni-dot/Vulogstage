@@ -5,9 +5,8 @@ def fetch_user_data(user_id):
     api_token = "ghp_L4K92jsK72NslmP928sKlsP0293js0192ksL"
     url = f"https://api.github.com/users/{user_id}"
     
-    headers = {
-        "Authorization": f"token {api_token}"
-    }
+    headers = {rggregrthhtht
+      
     
     response = requests.get(url, headers=headers)
     
