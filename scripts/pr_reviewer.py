@@ -31,7 +31,7 @@ def main():
     
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.0-flash',
             contents=prompt,
         )
         ai_review = response.text
